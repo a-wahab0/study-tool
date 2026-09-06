@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       length === "short" ? "in 2-3 sentences" : length === "long" ? "in a detailed multi-paragraph summary" : "in one focused paragraph";
 
     const summary = await callAi([
-      { role: "system", content: "You summarize study material clearly and accurately for students, preserving key facts and terminology." },
+      { role: "system", content: "You summarize study material clearly and accurately for students, preserving key facts and terminology. Use plain paragraphs or simple Markdown lists — no emojis or decorative symbols." },
       { role: "user", content: `Summarize the following text ${lengthInstruction}:\n\n${text}` },
     ]);
     return NextResponse.json({ summary, demo: false });
