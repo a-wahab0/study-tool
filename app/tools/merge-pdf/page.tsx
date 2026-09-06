@@ -9,7 +9,7 @@ import ProgressBar from "@/components/ProgressBar";
 import FaqSection from "@/components/FaqSection";
 import { getToolBySlug } from "@/core-lib/tools-registry";
 import { recordRecentTool, uid } from "@/core-lib/storage";
-import { downloadBlob, formatBytes } from "@/core-lib/utils";
+import { downloadBlob, formatBytes, bytesToBlob } from "@/core-lib/utils";
 import { useToast } from "@/components/Toast";
 
 const tool = getToolBySlug("merge-pdf")!;
@@ -77,7 +77,7 @@ export default function MergePdfPage() {
         pages.forEach((p) => merged.addPage(p));
       }
       const bytes = await merged.save();
-      const blob = new Blob([bytes], { type: "application/pdf" });
+      const blob = bytesToBlob(bytes, "application/pdf");
       setResultBlob(blob);
       show("PDFs merged successfully.", "success");
     } catch (err) {
