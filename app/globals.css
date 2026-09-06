@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import "katex/dist/katex.min.css";
 
 :root {
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial,
@@ -55,4 +56,103 @@ body {
   .label {
     @apply block text-sm font-medium text-ink-700 mb-1.5;
   }
+}
+
+/* Rendered Markdown (AI Study Assistant, quiz explanations, generated notes) */
+.markdown-body > *:first-child {
+  margin-top: 0;
+}
+.markdown-body > *:last-child {
+  margin-bottom: 0;
+}
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3 {
+  font-weight: 600;
+  color: theme("colors.ink.900");
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+  line-height: 1.3;
+}
+.markdown-body h1 {
+  font-size: 1.05rem;
+}
+.markdown-body h2 {
+  font-size: 1rem;
+}
+.markdown-body h3 {
+  font-size: 0.9rem;
+}
+.markdown-body p {
+  margin: 0.5rem 0;
+}
+.markdown-body strong {
+  font-weight: 600;
+  color: theme("colors.ink.900");
+}
+.markdown-body ul,
+.markdown-body ol {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+}
+.markdown-body ul {
+  list-style: disc;
+}
+.markdown-body ol {
+  list-style: decimal;
+}
+.markdown-body li {
+  margin: 0.2rem 0;
+}
+.markdown-body li > p {
+  margin: 0;
+}
+.markdown-body a {
+  color: theme("colors.brand.600");
+  text-decoration: underline;
+}
+.markdown-body code {
+  background-color: theme("colors.ink.100");
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.85em;
+}
+.markdown-body pre {
+  background-color: theme("colors.ink.900");
+  color: theme("colors.ink.50");
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  overflow-x: auto;
+  margin: 0.5rem 0;
+}
+.markdown-body pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+}
+.markdown-body blockquote {
+  border-left: 3px solid theme("colors.ink.200");
+  padding-left: 0.75rem;
+  color: theme("colors.ink.500");
+  margin: 0.5rem 0;
+}
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5rem 0;
+  font-size: 0.85em;
+}
+.markdown-body th,
+.markdown-body td {
+  border: 1px solid theme("colors.ink.200");
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+}
+.markdown-body th {
+  background-color: theme("colors.ink.50");
+  font-weight: 600;
+}
+.markdown-body hr {
+  border-color: theme("colors.ink.200");
+  margin: 0.75rem 0;
 }
