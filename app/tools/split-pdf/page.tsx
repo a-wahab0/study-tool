@@ -7,7 +7,7 @@ import DownloadButton from "@/components/DownloadButton";
 import FaqSection from "@/components/FaqSection";
 import { getToolBySlug } from "@/core-lib/tools-registry";
 import { recordRecentTool } from "@/core-lib/storage";
-import { downloadBlob, formatBytes } from "@/core-lib/utils";
+import { downloadBlob, formatBytes, bytesToBlob } from "@/core-lib/utils";
 import { useToast } from "@/components/Toast";
 
 const tool = getToolBySlug("split-pdf")!;
@@ -67,7 +67,7 @@ export default function SplitPdfPage() {
       const pages = await newDoc.copyPages(doc, indices);
       pages.forEach((p) => newDoc.addPage(p));
       const outBytes = await newDoc.save();
-      setResultBlob(new Blob([outBytes], { type: "application/pdf" }));
+      setResultBlob(bytesToBlob(outBytes, "application/pdf"));
       show("Pages extracted successfully.", "success");
     } catch {
       show("Could not split this PDF.", "error");
