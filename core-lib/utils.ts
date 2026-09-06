@@ -21,3 +21,7 @@ export function downloadBlob(blob: Blob, filename: string): void {
   // Release memory once the download has been triggered.
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
+export function bytesToBlob(bytes: Uint8Array, type: string): Blob {
+  const copy = new Uint8Array(bytes);
+  return new Blob([copy.buffer as ArrayBuffer], { type });
+}
