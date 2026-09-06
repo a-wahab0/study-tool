@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Send, Sparkles, Trash2 } from "lucide-react";
+import { Send, Sparkles, Trash2, Copy, Check, Share2 } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
+import MarkdownMessage from "@/components/MarkdownMessage";
 import { getChatHistory, saveChatHistory, clearChatHistory, uid } from "@/core-lib/storage";
 import type { ChatMessage } from "@/types";
 import { useToast } from "@/components/Toast";
@@ -17,11 +18,18 @@ const QUICK_PROMPTS = [
   "Generate 5 MCQs about this",
 ];
 
+function formatTranscript(messages: ChatMessage[]): string {
+  return messages
+    .map((m) => `${m.role === "user" ? "You" : "StudyHub AI"}: ${m.content}`)
+    .join("\n\n");
+}
+
 export default function AiStudyPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const { show } = useToast();
 
@@ -83,6 +91,38 @@ export default function AiStudyPage() {
     setMessages([]);
   };
 
+  const copyMessage = async (message: ChatMessage) => {
+    try {
+      await navigator.clipboard.writeText(message.content);
+      setCopiedId(message.id);
+      setTimeout(() => setCopiedId((id) => (id === message.id ? null : id)), 1500);
+    } catch {
+      show("Could not copy — select and copy manually.", "error");
+    }
+  };
+
+  const shareChat = async () => {
+    if (messages.length === 0) return;
+    const transcript = formatTranscript(messages);
+
+    // Prefer the native share sheet (works well on mobile) and fall back to
+    // copying the transcript to the clipboard everywhere else.
+    if (typeof navigator !== "undefined" && "share" in navigator) {
+      try {
+        await navigator.share({ title: "StudyHub conversation", text: transcript });
+        return;
+      } catch {
+        // User cancelled the share sheet, or share failed — fall through to copy.
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(transcript);
+      show("Conversation copied to clipboard — paste it anywhere to share.", "success");
+    } catch {
+      show("Could not share or copy this conversation.", "error");
+    }
+  };
+
   return (
     <div className="flex h-screen flex-col md:h-screen">
       <PageHeader
@@ -90,9 +130,14 @@ export default function AiStudyPage() {
         description="Ask questions, simplify concepts, and generate study material."
         actions={
           messages.length > 0 ? (
-            <button onClick={clearHistory} className="btn-secondary">
-              <Trash2 className="h-4 w-4" /> Clear
-            </button>
+            <>
+              <button onClick={shareChat} className="btn-secondary" aria-label="Share this conversation">
+                <Share2 className="h-4 w-4" /> Share
+              </button>
+              <button onClick={clearHistory} className="btn-secondary">
+                <Trash2 className="h-4 w-4" /> Clear
+              </button>
+            </>
           ) : undefined
         }
       />
@@ -108,15 +153,34 @@ export default function AiStudyPage() {
           ) : (
             <div className="space-y-4">
               {messages.map((m) => (
-                <div key={m.id} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
+                <div key={m.id} className={cn("flex flex-col gap-1", m.role === "user" ? "items-end" : "items-start")}>
                   <div
                     className={cn(
-                      "max-w-[85%] whitespace-pre-wrap rounded-xl px-4 py-2.5 text-sm",
+                      "max-w-[85%] rounded-xl px-4 py-2.5",
                       m.role === "user" ? "bg-brand-600 text-white" : "card text-ink-800"
                     )}
                   >
-                    {m.content}
+                    {m.role === "assistant" ? (
+                      <MarkdownMessage content={m.content} />
+                    ) : (
+                      <p className="whitespace-pre-wrap text-sm">{m.content}</p>
+                    )}
                   </div>
+                  <button
+                    onClick={() => copyMessage(m)}
+                    className="btn-ghost !px-1.5 !py-0.5 text-xs text-ink-400"
+                    aria-label="Copy message"
+                  >
+                    {copiedId === m.id ? (
+                      <>
+                        <Check className="h-3 w-3" /> Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3 w-3" /> Copy
+                      </>
+                    )}
+                  </button>
                 </div>
               ))}
               {sending && (
