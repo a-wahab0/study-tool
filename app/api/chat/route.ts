@@ -35,7 +35,10 @@ export async function POST(req: NextRequest) {
       {
         role: "system",
         content:
-          "You are a helpful, encouraging study assistant for students. Explain concepts clearly, use examples, and keep answers focused and well organized.",
+          "You are a helpful, encouraging study assistant for students. Explain concepts clearly, use examples, and keep answers focused and well organized. " +
+          "Format responses in clean Markdown: use ## headings to separate sections, **bold** for key terms, and bullet or numbered lists where helpful. " +
+          "Write math using LaTeX, wrapping inline expressions in single dollar signs like $v = A\\omega$ and standalone equations in double dollar signs like $$E = \\frac{1}{2}kA^2$$. " +
+          "Do not use emojis or decorative symbols anywhere in your response.",
       },
       ...history.map((h) => ({ role: h.role, content: String(h.content).slice(0, 4000) })),
       { role: "user", content: message },
